@@ -1,39 +1,44 @@
 import dotenv from 'dotenv';
-import express from 'express';
-import cors from 'cors';
-import pinoHttp from 'pino-http';
-
 dotenv.config();
 
-const app = express();
+import express from 'express';
+import cors from 'cors';
+import { connectMongoDB } from './db/connectMongoDB.js';
+import logger from './middleware/logger.js';
+import notFoundHandler from './middleware/notFoundHandler.js';
+import errorHandler from './middleware/errorHandler.js';
+import notesRoutes from './routes/notesRoutes.js';
+
 const PORT = process.env.PORT || 3000;
+const MONGO_URL = process.env.MONGO_URL;
 
-app.use(pinoHttp());
-app.use(cors());
+const app = express();
+
+app.use(logger);
 app.use(express.json());
+app.use(cors());
 
-app.get('/notes', (req, res) => {
-  res.status(200).json({ message: 'Retrieved all notes' });
-});
+app.use('/notes', notesRoutes);
 
-app.get('/notes/:noteId', (req, res) => {
-  const { noteId } = req.params;
-  res.status(200).json({ message: `Retrieved note with ID: ${noteId}` });
-});
+app.use(notFoundHandler);
 
-app.get('/test-error', () => {
-  throw new Error('Simulated server error');
-});
+app.use(errorHandler);
 
-app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
-});
+async function start() {
+  if (!MONGO_URL) {
+    console.error('❌ MONGO_URL is not defined in environment variables');
+    process.exit(1);
+  }
 
-app.use((err, req, res, next) => {
-  req.log?.error(err);
-  res.status(500).json({ message: err.message || 'Internal server error' });
-});
+  try {
+    await connectMongoDB(MONGO_URL);
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  }
+}
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+start();
