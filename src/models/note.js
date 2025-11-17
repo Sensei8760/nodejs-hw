@@ -1,27 +1,39 @@
-import mongoose from 'mongoose';
-
-const { Schema, model } = mongoose;
-
-const allowedTags = [
-  'Work',
-  'Personal',
-  'Meeting',
-  'Shopping',
-  'Ideas',
-  'Travel',
-  'Finance',
-  'Health',
-  'Important',
-  'Todo'
-];
+import { Schema } from 'mongoose';
+import { model } from 'mongoose';
 
 const noteSchema = new Schema(
   {
-    title: { type: String, required: true, trim: true },
-    content: { type: String, trim: true, default: '' },
-    tag: { type: String, enum: allowedTags, default: 'Todo' }
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    content: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    tag: {
+      type: String,
+      enum: [
+        'Work',
+        'Personal',
+        'Meeting',
+        'Shopping',
+        'Ideas',
+        'Travel',
+        'Finance',
+        'Health',
+        'Important',
+        'Todo',
+      ],
+      default: 'Todo',
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    versionKey: false,
+  },
 );
 
-export default model('Note', noteSchema);
+export const Note = model('Note', noteSchema);
