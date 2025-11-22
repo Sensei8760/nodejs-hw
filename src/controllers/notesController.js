@@ -9,8 +9,6 @@ export const getAllNotes = async (req, res) => {
     perPage = 10,
     tag,
     search,
-    sortBy = '_id',
-    sortOrder = 'asc',
   } = req.query;
   const skip = (page - 1) * perPage;
 
@@ -30,7 +28,6 @@ export const getAllNotes = async (req, res) => {
     notesQuery
       .skip(skip)
       .limit(perPage)
-      .sort({ [sortBy]: sortOrder }),
   ]);
 
   const totalPages = Math.ceil(totalNotes / perPage);
@@ -73,7 +70,6 @@ export const deleteNote = async (req, res, next) => {
   res.status(200).json(note);
 };
 
-// частково оновлюємо
 export const updateNote = async (req, res, next) => {
   const { noteId } = req.params;
 
