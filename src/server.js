@@ -12,15 +12,24 @@ import { errors } from 'celebrate';
 const app = express();
 const PORT = process.env.PORT ?? 3030;
 
+// Global middleware
 app.use(logger);
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
+
+// Routes
 app.use(notesRouters);
-app.use(errors());
+
+// 404
 app.use(notFoundHandler);
 
+// celebrate validation errors
+app.use(errors());
+
+// Final error handler (must be LAST)
 app.use(errorHandler);
+
 await connectMongoDB();
 
 app.listen(PORT, () => {
