@@ -1,6 +1,4 @@
-// src/models/user.js
-
-import { Schema, model } from 'mongoose';
+import { model, Schema } from 'mongoose';
 
 const userSchema = new Schema(
   {
@@ -10,35 +8,34 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      required: true,
       unique: true,
+      required: true,
       trim: true,
     },
     password: {
       type: String,
       required: true,
-      minlength: 8,
+    },
+    // Нова властивість
+    avatar: {
+      type: String,
+      required: false,
+      default: 'https://ac.goit.global/fullstack/react/default-avatar.jpg',
     },
   },
-  {
-    timestamps: true,
-    versionKey: false,
-  },
+  { timestamps: true, versionKey: false },
 );
 
-// username за замовчуванням = email при створенні користувача
 userSchema.pre('save', function (next) {
-  if (this.isNew && !this.username) {
+  if (!this.username) {
     this.username = this.email;
   }
   next();
 });
-
-// не віддавати пароль у відповіді
+// Перевизначаємо метод toJSON
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
   return obj;
 };
-
 export const User = model('User', userSchema);

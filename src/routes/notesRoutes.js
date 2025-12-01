@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { celebrate } from 'celebrate';
+
 import {
   getAllNotesSchema,
   noteIdSchema,
   createNoteSchema,
   updateNoteSchema,
 } from '../validations/notesValidation.js';
+
 import {
   getAllNotes,
   getNoteById,
@@ -13,12 +15,12 @@ import {
   deleteNote,
   updateNote,
 } from '../controllers/notesController.js';
+
 import { authenticate } from '../middleware/authenticate.js';
 
 const router = Router();
 
-// усі ноти — тільки для авторизованих
-router.use(authenticate);
+router.use('/notes', authenticate);
 
 router.get('/notes', celebrate(getAllNotesSchema), getAllNotes);
 
