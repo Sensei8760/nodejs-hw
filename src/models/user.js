@@ -16,7 +16,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    // Нова властивість
+
     avatar: {
       type: String,
       required: false,
@@ -32,7 +32,7 @@ userSchema.pre('save', function (next) {
   }
   next();
 });
-// Перевизначаємо метод toJSON
+
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
